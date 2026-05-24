@@ -19,6 +19,8 @@ const navItems = [
   { id: "bonus", label: "БОНУСЫ", icon: "Gift" },
 ];
 
+const SUPPORT_URL = "https://t.me/Magiscesh";
+
 export default function NavBar({ user, currentPage, navigate, onLogin, onRegister, onLogout }: NavBarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -42,6 +44,16 @@ export default function NavBar({ user, currentPage, navigate, onLogin, onRegiste
               {item.label}
             </button>
           ))}
+          <a
+            href={SUPPORT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="nav-item px-3 py-2 rounded-lg flex items-center gap-1.5"
+            style={{ color: "#00FF88" }}
+          >
+            <Icon name="Headphones" size={14} />
+            ПОДДЕРЖКА
+          </a>
           <button
             onClick={() => navigate("admin")}
             className={`nav-item px-3 py-2 rounded-lg flex items-center gap-1.5 ${currentPage === "admin" ? "active bg-white/5" : ""}`}
@@ -144,7 +156,17 @@ export default function NavBar({ user, currentPage, navigate, onLogin, onRegiste
               <button onClick={() => { onRegister(); setMenuOpen(false); }} className="btn-neon-gold flex-1 py-2 text-sm">РЕГИСТРАЦИЯ</button>
             </div>
           )}
-          <div className="pt-2 border-t border-white/5">
+          <div className="pt-2 border-t border-white/5 space-y-1">
+            <a
+              href={SUPPORT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-2"
+              style={{ color: "#00FF88" }}
+              onClick={() => setMenuOpen(false)}
+            >
+              <Icon name="Headphones" size={16} /> ПОДДЕРЖКА
+            </a>
             <button onClick={() => { navigate("admin"); setMenuOpen(false); }}
               className="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-2"
               style={{ color: "rgba(255,255,255,0.25)" }}>
