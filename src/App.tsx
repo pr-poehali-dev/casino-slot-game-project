@@ -10,6 +10,7 @@ import BonusPage from "./pages/casino/BonusPage";
 import HistoryPage from "./pages/casino/HistoryPage";
 import AuthModal from "./pages/casino/AuthModal";
 import NavBar from "./pages/casino/NavBar";
+import AdminPage from "./pages/casino/AdminPage";
 
 export type User = {
   id: string;
@@ -133,6 +134,9 @@ export default function App() {
         )}
         {page === "history" && user && (
           <HistoryPage transactions={transactions} navigate={navigate} />
+        )}
+        {page === "admin" && (
+          <AdminPage navigate={navigate} />
         )}
       </div>
 

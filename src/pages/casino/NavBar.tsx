@@ -42,6 +42,15 @@ export default function NavBar({ user, currentPage, navigate, onLogin, onRegiste
               {item.label}
             </button>
           ))}
+          <button
+            onClick={() => navigate("admin")}
+            className={`nav-item px-3 py-2 rounded-lg flex items-center gap-1.5 ${currentPage === "admin" ? "active bg-white/5" : ""}`}
+            style={{ color: currentPage === "admin" ? "#FFD700" : "rgba(255,255,255,0.3)" }}
+            title="Панель администратора"
+          >
+            <Icon name="Settings2" size={14} />
+            ADMIN
+          </button>
         </div>
 
         {/* Right side */}
@@ -123,6 +132,13 @@ export default function NavBar({ user, currentPage, navigate, onLogin, onRegiste
               <button onClick={() => { onRegister(); setMenuOpen(false); }} className="btn-neon-gold flex-1 py-2 text-sm">РЕГИСТРАЦИЯ</button>
             </div>
           )}
+          <div className="pt-2 border-t border-white/5">
+            <button onClick={() => { navigate("admin"); setMenuOpen(false); }}
+              className="nav-item w-full text-left px-4 py-3 rounded-lg flex items-center gap-2"
+              style={{ color: "rgba(255,255,255,0.25)" }}>
+              <Icon name="Settings2" size={16} /> ADMIN
+            </button>
+          </div>
         </div>
       )}
     </nav>
