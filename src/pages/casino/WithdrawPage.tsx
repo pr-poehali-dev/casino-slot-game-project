@@ -13,6 +13,12 @@ const MIN_WITHDRAW = 1000;
 const MIN_DEPOSIT_FOR_WITHDRAW = 100;
 const DEPOSIT_WINDOW_DAYS = 7;
 
+const BANKS = [
+  { id: "tinkoff", name: "Тинькофф", emoji: "🟡", color: "rgba(255,220,0,0.15)", border: "rgba(255,220,0,0.4)" },
+  { id: "ozon", name: "Озон Банк", emoji: "🔵", color: "rgba(0,130,255,0.15)", border: "rgba(0,130,255,0.4)" },
+  { id: "sber", name: "Сбербанк", emoji: "🟢", color: "rgba(0,200,100,0.15)", border: "rgba(0,200,100,0.4)" },
+];
+
 function checkRecentDeposit(): { ok: boolean; totalDeposited: number } {
   const txs: Transaction[] = JSON.parse(localStorage.getItem("casino_txs") || "[]");
   const cutoff = Date.now() - DEPOSIT_WINDOW_DAYS * 24 * 60 * 60 * 1000;
@@ -27,13 +33,13 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
   const [amount, setAmount] = useState("");
   const [phone, setPhone] = useState("");
   const [cardNumber, setCardNumber] = useState("");
+  const [selectedBank, setSelectedBank] = useState<string | null>(null);
   const [method, setMethod] = useState<"card" | "phone">("card");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [txId, setTxId] = useState("");
 
   const depositCheck = checkRecentDeposit();
-
   const amountNum = parseFloat(amount) || 0;
   const canWithdraw = user.balance >= MIN_WITHDRAW;
   const hasRecentDeposit = depositCheck.ok;
@@ -48,24 +54,33 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
       setError("Недостаточно средств на балансе");
       return;
     }
-    if (method === "card" && cardNumber.replace(/\s/g, "").length < 16) {
-      setError("Введи корректный номер карты (16 цифр)");
-      return;
+    if (method === "card") {
+      if (!selectedBank) {
+        setError("Выбери банк для вывода");
+        return;
+      }
+      if (cardNumber.replace(/\s/g, "").length < 16) {
+        setError("Введи корректный номер карты (16 цифр)");
+        return;
+      }
     }
     if (method === "phone" && phone.replace(/\D/g, "").length < 10) {
       setError("Введи корректный номер телефона");
       return;
     }
 
+    const bankName = BANKS.find(b => b.id === selectedBank)?.name || "";
+    const details = method === "card"
+      ? `Карта ${bankName}: ${cardNumber}`
+      : `Телефон: ${phone}`;
+
     const tx = addTransaction({
       type: "withdraw",
       amount: amountNum,
       status: "pending",
-      details: method === "card" ? `Карта: ${cardNumber}` : `Телефон: ${phone}`,
+      details,
     });
     setTxId(tx.id);
-
-    // Deduct from balance immediately
     saveUser({ ...user, balance: user.balance - amountNum });
     setSubmitted(true);
   };
@@ -105,7 +120,6 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
         <h1 className="font-oswald text-3xl font-bold text-white">ВЫВОД СРЕДСТВ</h1>
       </div>
 
-      {/* Balance */}
       <div className="casino-card neon-border-green p-4 mb-6 flex items-center justify-between">
         <span className="text-white/60 font-oswald text-sm">ДОСТУПНО К ВЫВОДУ</span>
         <span className="font-oswald text-xl font-bold neon-green">{user.balance.toFixed(0)} ₽</span>
@@ -125,6 +139,7 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
         </div>
       ) : (
         <div className="casino-card neon-border-green p-6 space-y-5 animate-fade-in-up">
+
           {/* Предупреждение о пополнении */}
           {!hasRecentDeposit ? (
             <div className="rounded-xl p-4 space-y-3"
@@ -132,26 +147,17 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
               <div className="flex items-start gap-3">
                 <div className="text-2xl shrink-0">⚠️</div>
                 <div>
-                  <div className="font-oswald font-bold text-red-400 text-base mb-1">
-                    ВНИМАНИЕ: ВЫВОД МОЖЕТ БЫТЬ ОТКЛОНЁН
-                  </div>
+                  <div className="font-oswald font-bold text-red-400 text-base mb-1">ВЫВОД МОЖЕТ БЫТЬ ОТКЛОНЁН</div>
                   <p className="text-white/60 font-rubik text-sm leading-relaxed">
-                    Для успешного вывода необходимо пополнение на сумму{" "}
-                    <strong className="text-white">от {MIN_DEPOSIT_FOR_WITHDRAW} ₽</strong> за последние{" "}
-                    <strong className="text-white">{DEPOSIT_WINDOW_DAYS} дней</strong>.
+                    Необходимо пополнение от <strong className="text-white">{MIN_DEPOSIT_FOR_WITHDRAW} ₽</strong> за последние <strong className="text-white">{DEPOSIT_WINDOW_DAYS} дней</strong>.
                   </p>
                   <p className="text-white/40 font-rubik text-xs mt-1.5">
-                    Твоё пополнение за 7 дней:{" "}
-                    <span className="text-red-400 font-bold">{depositCheck.totalDeposited} ₽</span>{" "}
-                    — минимум {MIN_DEPOSIT_FOR_WITHDRAW} ₽
+                    Твоё пополнение за 7 дней: <span className="text-red-400 font-bold">{depositCheck.totalDeposited} ₽</span>
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => navigate("deposit")}
-                className="w-full py-2.5 rounded-xl font-oswald text-sm font-bold transition-all"
-                style={{ background: "linear-gradient(135deg, #FFD700, #FF8C00)", color: "#000", boxShadow: "0 0 15px rgba(255,215,0,0.3)" }}
-              >
+              <button onClick={() => navigate("deposit")} className="w-full py-2.5 rounded-xl font-oswald text-sm font-bold transition-all"
+                style={{ background: "linear-gradient(135deg, #FFD700, #FF8C00)", color: "#000" }}>
                 ПОПОЛНИТЬ СЕЙЧАС →
               </button>
             </div>
@@ -164,7 +170,8 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
               </span>
             </div>
           )}
-          {/* Method */}
+
+          {/* Способ вывода */}
           <div>
             <div className="text-xs text-white/40 font-oswald mb-2">СПОСОБ ВЫВОДА</div>
             <div className="flex gap-2">
@@ -183,7 +190,34 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
             </div>
           </div>
 
-          {/* Requisites */}
+          {/* Выбор банка (только для карты) */}
+          {method === "card" && (
+            <div>
+              <div className="text-xs text-white/40 font-oswald mb-2">БАНК</div>
+              <div className="grid grid-cols-3 gap-2">
+                {BANKS.map(bank => (
+                  <button
+                    key={bank.id}
+                    onClick={() => setSelectedBank(bank.id)}
+                    className="py-3 rounded-xl font-oswald text-sm transition-all flex flex-col items-center gap-1"
+                    style={{
+                      background: selectedBank === bank.id ? bank.color : "rgba(255,255,255,0.04)",
+                      border: `1.5px solid ${selectedBank === bank.id ? bank.border : "rgba(255,255,255,0.08)"}`,
+                      boxShadow: selectedBank === bank.id ? `0 0 12px ${bank.border}` : "none",
+                    }}
+                  >
+                    <span className="text-xl">{bank.emoji}</span>
+                    <span className="text-xs text-white/80">{bank.name}</span>
+                    {selectedBank === bank.id && (
+                      <Icon name="CheckCircle" size={12} className="text-green-400" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Реквизиты */}
           {method === "card" ? (
             <div>
               <label className="text-xs text-white/40 font-oswald mb-2 block">НОМЕР КАРТЫ</label>
@@ -207,7 +241,7 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
             </div>
           )}
 
-          {/* Amount */}
+          {/* Сумма */}
           <div>
             <label className="text-xs text-white/40 font-oswald mb-2 block">СУММА ВЫВОДА (мин. {MIN_WITHDRAW} ₽)</label>
             <input
@@ -233,8 +267,8 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
           <button
             onClick={handleSubmit}
             disabled={!amount || amountNum < MIN_WITHDRAW || !hasRecentDeposit}
-            className="btn-neon-green w-full py-4 text-lg font-oswald disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ background: "linear-gradient(135deg, #00FF88, #00BB66)", color: "#000" }}
+            className="w-full py-4 text-lg font-oswald rounded-lg font-bold disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            style={{ background: "linear-gradient(135deg, #00FF88, #00BB66)", color: "#000", boxShadow: "0 0 20px rgba(0,255,136,0.3)" }}
           >
             ПОДАТЬ ЗАЯВКУ НА ВЫВОД
           </button>
