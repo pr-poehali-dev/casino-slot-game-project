@@ -55,8 +55,7 @@ export default function HomePage({ user, navigate, onRegister }: HomePageProps) 
           🔥 ЛУЧШИЕ ВЫПЛАТЫ В СЕТИ
         </div>
         <h1 className="font-oswald text-5xl md:text-7xl font-black mb-4" style={{ lineHeight: 1.1 }}>
-          <span className="neon-gold">LUCKY</span>{" "}
-          <span style={{ color: "#fff" }}>STAR</span>
+          <span className="neon-gold">MAGIS</span><span style={{ color: "#fff" }}>CESH</span>
         </h1>
         <p className="text-white/60 text-lg md:text-xl font-rubik mb-8 max-w-xl mx-auto">
           Играй. Выигрывай. Снимай деньги — реальные выплаты каждый день!

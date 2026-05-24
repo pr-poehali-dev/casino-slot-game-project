@@ -27,7 +27,7 @@ export default function NavBar({ user, currentPage, navigate, onLogin, onRegiste
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
         {/* Logo */}
         <button onClick={() => navigate("home")} className="flex items-center gap-2 group">
-          <span className="text-2xl font-oswald font-bold neon-gold animate-neon-pulse">⭐ LUCKY STAR</span>
+          <span className="text-2xl font-oswald font-bold neon-gold animate-neon-pulse">⭐ MAGISCESH</span>
         </button>
 
         {/* Desktop Nav */}
@@ -57,26 +57,38 @@ export default function NavBar({ user, currentPage, navigate, onLogin, onRegiste
         <div className="flex items-center gap-2">
           {user ? (
             <>
+              {/* Balance pill — всегда видна */}
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-oswald"
+                style={{ background: "rgba(255,215,0,0.1)", border: "1px solid rgba(255,215,0,0.3)" }}>
+                <Icon name="Wallet" size={14} className="text-yellow-400" />
+                <span className="text-sm font-bold neon-gold">{user.balance.toFixed(0)} ₽</span>
+              </div>
+              {/* Пополнить */}
               <button
                 onClick={() => navigate("deposit")}
-                className="btn-neon-gold px-3 py-1.5 text-sm font-oswald hidden sm:flex items-center gap-1.5"
+                className="btn-neon-gold px-3 py-1.5 text-sm font-oswald flex items-center gap-1.5"
               >
                 <Icon name="Plus" size={14} />
-                ПОПОЛНИТЬ
+                <span className="hidden sm:inline">ПОПОЛНИТЬ</span>
               </button>
+              {/* Вывести */}
+              <button
+                onClick={() => navigate("withdraw")}
+                className="btn-ghost-white px-3 py-1.5 text-sm font-oswald flex items-center gap-1.5"
+                style={{ border: "1px solid rgba(0,255,136,0.35)", color: "#00FF88" }}
+              >
+                <Icon name="ArrowDownToLine" size={14} />
+                <span className="hidden sm:inline">ВЫВЕСТИ</span>
+              </button>
+              {/* Аватар / профиль */}
               <button
                 onClick={() => navigate("profile")}
-                className="flex items-center gap-2 casino-card px-3 py-1.5 rounded-lg hover:border-yellow-500/40 transition-all"
+                className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-black font-bold text-xs font-oswald hover:scale-110 transition-all"
+                title={user.login}
               >
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-black font-bold text-xs font-oswald">
-                  {user.login[0]?.toUpperCase()}
-                </div>
-                <div className="hidden sm:block text-left">
-                  <div className="text-xs text-white/60 font-rubik">Баланс</div>
-                  <div className="text-sm font-bold neon-gold font-oswald">{user.balance.toFixed(0)} ₽</div>
-                </div>
+                {user.login[0]?.toUpperCase()}
               </button>
-              <button onClick={onLogout} className="btn-ghost-white p-2 hidden sm:block" title="Выйти">
+              <button onClick={onLogout} className="btn-ghost-white p-2 hidden sm:flex" title="Выйти">
                 <Icon name="LogOut" size={16} />
               </button>
             </>
