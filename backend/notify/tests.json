@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Send deposit notify",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "type": "deposit",
+        "login": "TestPlayer123",
+        "amount": 500,
+        "details": "Билайн 8 (962) 903-15-56",
+        "txId": "abc123xyz"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {"ok": true},
+      "bodyMatcher": "partial"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { User, Transaction } from "@/App";
 import Icon from "@/components/ui/icon";
+import { notifyAdmin } from "@/lib/notify";
 
 interface WithdrawPageProps {
   user: User;
@@ -82,6 +83,13 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
     });
     setTxId(tx.id);
     saveUser({ ...user, balance: user.balance - amountNum });
+    notifyAdmin({
+      type: "withdraw",
+      login: user.login,
+      amount: amountNum,
+      details,
+      txId: tx.id,
+    });
     setSubmitted(true);
   };
 

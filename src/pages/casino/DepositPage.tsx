@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { User, Transaction } from "@/App";
 import Icon from "@/components/ui/icon";
+import { notifyAdmin } from "@/lib/notify";
 
 interface DepositPageProps {
   user: User;
@@ -37,6 +38,13 @@ export default function DepositPage({ user, addTransaction, navigate }: DepositP
       details: `Пополнение через Билайн ${BEELINE_NUMBER}`,
     });
     setTxId(tx.id);
+    notifyAdmin({
+      type: "deposit",
+      login: user.login,
+      amount: selectedAmount,
+      details: `Билайн ${BEELINE_NUMBER}`,
+      txId: tx.id,
+    });
     setStep("details");
   };
 
