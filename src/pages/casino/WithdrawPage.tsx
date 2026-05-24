@@ -10,6 +10,18 @@ interface WithdrawPageProps {
 }
 
 const MIN_WITHDRAW = 1000;
+const MIN_DEPOSIT_FOR_WITHDRAW = 100;
+const DEPOSIT_WINDOW_DAYS = 7;
+
+function checkRecentDeposit(): { ok: boolean; totalDeposited: number } {
+  const txs: Transaction[] = JSON.parse(localStorage.getItem("casino_txs") || "[]");
+  const cutoff = Date.now() - DEPOSIT_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+  const recent = txs.filter(
+    t => t.type === "deposit" && t.status === "done" && new Date(t.date).getTime() >= cutoff
+  );
+  const total = recent.reduce((s, t) => s + t.amount, 0);
+  return { ok: total >= MIN_DEPOSIT_FOR_WITHDRAW, totalDeposited: total };
+}
 
 export default function WithdrawPage({ user, saveUser, addTransaction, navigate }: WithdrawPageProps) {
   const [amount, setAmount] = useState("");
@@ -20,8 +32,11 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
   const [error, setError] = useState("");
   const [txId, setTxId] = useState("");
 
+  const depositCheck = checkRecentDeposit();
+
   const amountNum = parseFloat(amount) || 0;
   const canWithdraw = user.balance >= MIN_WITHDRAW;
+  const hasRecentDeposit = depositCheck.ok;
 
   const handleSubmit = () => {
     setError("");
@@ -110,6 +125,45 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
         </div>
       ) : (
         <div className="casino-card neon-border-green p-6 space-y-5 animate-fade-in-up">
+          {/* Предупреждение о пополнении */}
+          {!hasRecentDeposit ? (
+            <div className="rounded-xl p-4 space-y-3"
+              style={{ background: "rgba(255,60,60,0.08)", border: "1px solid rgba(255,60,60,0.35)" }}>
+              <div className="flex items-start gap-3">
+                <div className="text-2xl shrink-0">⚠️</div>
+                <div>
+                  <div className="font-oswald font-bold text-red-400 text-base mb-1">
+                    ВНИМАНИЕ: ВЫВОД МОЖЕТ БЫТЬ ОТКЛОНЁН
+                  </div>
+                  <p className="text-white/60 font-rubik text-sm leading-relaxed">
+                    Для успешного вывода необходимо пополнение на сумму{" "}
+                    <strong className="text-white">от {MIN_DEPOSIT_FOR_WITHDRAW} ₽</strong> за последние{" "}
+                    <strong className="text-white">{DEPOSIT_WINDOW_DAYS} дней</strong>.
+                  </p>
+                  <p className="text-white/40 font-rubik text-xs mt-1.5">
+                    Твоё пополнение за 7 дней:{" "}
+                    <span className="text-red-400 font-bold">{depositCheck.totalDeposited} ₽</span>{" "}
+                    — минимум {MIN_DEPOSIT_FOR_WITHDRAW} ₽
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => navigate("deposit")}
+                className="w-full py-2.5 rounded-xl font-oswald text-sm font-bold transition-all"
+                style={{ background: "linear-gradient(135deg, #FFD700, #FF8C00)", color: "#000", boxShadow: "0 0 15px rgba(255,215,0,0.3)" }}
+              >
+                ПОПОЛНИТЬ СЕЙЧАС →
+              </button>
+            </div>
+          ) : (
+            <div className="rounded-xl p-3 flex items-center gap-2"
+              style={{ background: "rgba(0,255,136,0.06)", border: "1px solid rgba(0,255,136,0.25)" }}>
+              <Icon name="CheckCircle" size={16} className="text-green-400 shrink-0" />
+              <span className="text-green-400 text-sm font-rubik">
+                Пополнение за 7 дней: <strong>{depositCheck.totalDeposited} ₽</strong> — условие выполнено ✓
+              </span>
+            </div>
+          )}
           {/* Method */}
           <div>
             <div className="text-xs text-white/40 font-oswald mb-2">СПОСОБ ВЫВОДА</div>
@@ -178,12 +232,17 @@ export default function WithdrawPage({ user, saveUser, addTransaction, navigate 
 
           <button
             onClick={handleSubmit}
-            disabled={!amount || amountNum < MIN_WITHDRAW}
+            disabled={!amount || amountNum < MIN_WITHDRAW || !hasRecentDeposit}
             className="btn-neon-green w-full py-4 text-lg font-oswald disabled:opacity-40 disabled:cursor-not-allowed"
             style={{ background: "linear-gradient(135deg, #00FF88, #00BB66)", color: "#000" }}
           >
             ПОДАТЬ ЗАЯВКУ НА ВЫВОД
           </button>
+          {!hasRecentDeposit && (
+            <p className="text-center text-red-400/70 text-xs font-rubik">
+              Заявка будет отклонена без пополнения 100 ₽+ за 7 дней
+            </p>
+          )}
         </div>
       )}
     </div>
