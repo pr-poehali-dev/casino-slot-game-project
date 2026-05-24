@@ -159,21 +159,50 @@ export default function HomePage({ user, navigate, onRegister }: HomePageProps) 
         </div>
       </div>
 
-      {/* Support */}
-      <div className="mt-12 casino-card p-6 flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "rgba(0,255,136,0.15)" }}>
-            <Icon name="Headphones" size={24} className="text-green-400" />
-          </div>
-          <div>
-            <div className="font-oswald text-white font-bold">ПОДДЕРЖКА 24/7</div>
-            <div className="text-white/50 text-sm">Ответим на любой вопрос</div>
-          </div>
+      {/* Support banner */}
+      <div className="mt-12 rounded-2xl overflow-hidden relative"
+        style={{ background: "linear-gradient(135deg, rgba(0,255,136,0.08), rgba(0,180,100,0.12))", border: "1px solid rgba(0,255,136,0.3)" }}>
+        {/* Декоративный фон */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -right-10 -top-10 w-48 h-48 rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(0,255,136,0.12) 0%, transparent 70%)" }} />
+          <div className="absolute -left-10 -bottom-10 w-48 h-48 rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(0,200,100,0.08) 0%, transparent 70%)" }} />
         </div>
-        <div className="flex gap-3">
-          <a href="https://t.me/luckystar_support" className="btn-neon-green px-4 py-2 text-sm flex items-center gap-2 rounded-lg font-oswald"
-            style={{ background: "linear-gradient(135deg, #00FF88, #00BB66)", color: "#000", fontWeight: 700, boxShadow: "0 0 15px rgba(0,255,136,0.4)" }}>
-            <Icon name="Send" size={14} /> TELEGRAM
+
+        <div className="relative p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
+          {/* Icon */}
+          <div className="w-20 h-20 rounded-2xl flex items-center justify-center shrink-0"
+            style={{ background: "rgba(0,255,136,0.15)", border: "2px solid rgba(0,255,136,0.4)", boxShadow: "0 0 30px rgba(0,255,136,0.2)" }}>
+            <Icon name="Headphones" size={36} className="text-green-400" />
+          </div>
+
+          {/* Text */}
+          <div className="flex-1 text-center md:text-left">
+            <div className="font-oswald text-2xl md:text-3xl font-black mb-1" style={{ color: "#00FF88", textShadow: "0 0 15px rgba(0,255,136,0.5)" }}>
+              ПОДДЕРЖКА 24/7
+            </div>
+            <p className="text-white/60 font-rubik text-sm md:text-base">
+              Есть вопросы по пополнению, выводу или игре?<br className="hidden md:block" />
+              Пиши — ответим быстро в Telegram!
+            </p>
+            <div className="flex flex-wrap gap-2 mt-3 justify-center md:justify-start text-xs text-white/30 font-rubik">
+              <span className="flex items-center gap-1"><Icon name="Zap" size={12} className="text-green-400" /> Быстрые ответы</span>
+              <span className="flex items-center gap-1"><Icon name="Shield" size={12} className="text-green-400" /> Решаем любые вопросы</span>
+              <span className="flex items-center gap-1"><Icon name="Clock" size={12} className="text-green-400" /> Всегда на связи</span>
+            </div>
+          </div>
+
+          {/* Button */}
+          <a
+            href="https://t.me/Magiscesh"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 flex items-center gap-3 px-8 py-4 rounded-xl font-oswald font-bold text-lg transition-all hover:scale-105"
+            style={{ background: "linear-gradient(135deg, #00FF88, #00BB66)", color: "#000", boxShadow: "0 0 25px rgba(0,255,136,0.5)" }}
+          >
+            <Icon name="Send" size={20} />
+            НАПИСАТЬ
           </a>
         </div>
       </div>
